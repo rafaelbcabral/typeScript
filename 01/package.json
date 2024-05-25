@@ -1,0 +1,14 @@
+{
+  "name": "cls",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tsc-watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
