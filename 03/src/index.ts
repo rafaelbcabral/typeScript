@@ -1,157 +1,113 @@
-let planets = []
+interface GitHubUserResponse{
+  id: number,
+  login: string,
+  name: string,
+  bio: string,
+  public_repos: number,
+  repos_url: string,
+  message?: "Not Found"
+}
 
-function addPlanet(name: string, coordenadas: [number, number, number, number], situacao: "habitado" | "habitavel" | "inabitavel" | "inexplorado", satelites: string[]){
-  let planet = {
-    name,
-    coordenadas,
-    situacao,
-    satelites
+interface GitHubRepoResponse{
+  name: string,
+  description: string,
+  fork: boolean,
+  stargazers_count: number
+}
+
+const users: GitHubUserResponse[] = []
+
+async function fetchUser(username: string){
+  const response = await fetch(`http://api.github.com/users/${username}`)
+
+  const user: GitHubUserResponse = await response.json()
+
+  if(user.message){
+    console.log(`Usuário nao encontrado!`)
+  }else{
+    users.push(user)
+
+    
+		alert(
+      `O usuário ${user.login} foi salvo.\n` +
+      `\nid: ${user.id}` +
+      `\nlogin: ${user.login}` +
+      `\nNome: ${user.name}` +
+      `\nBio: ${user.bio}` +
+      `\nRepositórios públicos: ${user.public_repos}`
+    )
   }
-
-  planets.push(planet);
-  alert(`${planet.name} foi adicionado.`)
 
 }
 
-function valuesPlanet(){
-  const name = prompt('Qual é o nome do planeta a ser registrado?')
-  const coordenada1 = parseFloat(prompt('Qual é a primeira coordenada?'))
-  const coordenada2 = parseFloat(prompt('Qual é a segunda coordenada?'))
-  const coordenada3 = parseFloat(prompt('Qual é a terceira coordenada?'))
-  const coordenada4 = parseFloat(prompt('Qual é a quarta coordenada?'))  
-  
-  if (isNaN(coordenada1) || isNaN(coordenada2) || isNaN(coordenada3) || isNaN(coordenada4)) {
-    alert('Uma ou mais coordenadas não são válidas. Por favor, insira números válidos.');
-    return;
-  }
-  
-  const coordenadas: [number, number, number, number]  = [coordenada1, coordenada2, coordenada3, coordenada4]
-  const situacao = prompt("Qual a situacao do planeta? (habitado, habitavel, inabitavel, inexplorado)")
-  
-  if (situacao === "habitado" || situacao === "habitavel" || situacao === "inabitavel" || situacao === "inexplorado") {
-    const satelites = []
+async function showUser(username: string){
+  const user = users.find(user => user.login === username)
 
-    do {
-      const nomeSatelite = prompt('Digite o nome de um satelite');
-      satelites.push(nomeSatelite);
-      var adicionarSatelite = String(prompt(`Deseja adicionar mais um satelite? Digite "Sim" se deseja ou pressione qualquer tecla para sair.`));
-  } while (adicionarSatelite == "Sim");
+  if(typeof user === "undefined"){
+    console.log("Usuário nao encontrado")
+  }else{
+    const response = await fetch(user.repos_url)
+    const repos: GitHubRepoResponse[] = await response.json()
 
-    addPlanet(name, coordenadas, situacao, satelites);
-  } else{
-    alert('Situação inválida. Por favor, insira uma situação válida.');
+    let message = `id: ${user.id}\n` +
+    `\nlogin: ${user.login}` +
+    `\nNome: ${user.name}` +
+    `\nBio: ${user.bio}` +
+    `\nRepositórios públicos: ${user.public_repos}`
+
+  repos.forEach(repo => {
+    message += `\nNome: ${repo.name}` +
+      `\nDescrição: ${repo.description}` +
+      `\nEstrelas: ${repo.stargazers_count}` +
+      `\nÉ um fork: ${repo.fork ? 'Sim' : 'Não'}\n`
+  })
+
+  console.log(message)
   }
 }
 
-function updatePlanetSituation() {
-  const name = prompt('Qual é o nome do planeta cuja situação você deseja atualizar?');
-  const newSituacao = prompt('Qual a nova situação do planeta? (habitado, habitavel, inabitavel, inexplorado)');
+function showAllUsers(){
+  let message = 'Usuários:\n'
 
-  if (newSituacao !== "habitado" && newSituacao !== "habitavel" && newSituacao !== "inabitavel" && newSituacao !== "inexplorado") {
-    alert('Situação inválida. Por favor, insira uma situação válida.');
-    return;
-  }
+  users.forEach(user => {
+    message += `\n $(user.login)`
+  })
 
-  for (let i = 0; i < planets.length; i++) {
-
-    if(planets[i].situacao === newSituacao){
-      alert(`O planeta já está na situaçao ${newSituacao}!`)
-      return
-    }
-    if (planets[i].name == name) {
-      planets[i].situacao = newSituacao;
-      alert(`A situação do planeta ${name} foi atualizada para ${newSituacao}.`);
-      return;
-    }
-  }
-
-  alert(`Planeta com o nome ${name} não encontrado.`);
+  console.log(message)
 }
 
-function addSatelite(){
-  const name = prompt('Qual é o nome do planeta cuja deseja adicionar um satélite?');
-  const sateliteNovo = prompt('Digite o nome do satelite que quer adicionar');
+function showReposTotal(){
+  const reposTotal = users.reduce((acc, user ) => acc + user.public_repos, 0)
 
-  for (let i = 0; i < planets.length; i++) {
-    if (planets[i].name === name) {
-      if (planets[i].satelites.includes(sateliteNovo)) {
-        alert(`${sateliteNovo} já está cadastrado!`);
-        return;
-      } else {
-        planets[i].satelites.push(sateliteNovo);
-        alert(`${sateliteNovo} adicionado ao planeta ${name}`);
-        return;
-      }
-  }
-}
-  alert(`Planeta com o nome ${name} não encontrado.`);
+  console.log(`O grupo possui um total de ${reposTotal} repositórios públicos!`)
 }
 
-function removeSatelite(){
-  const name = prompt('Qual o nome do planeta que deseja remover algum satélite?')
-  const sateliteParaRemover = prompt('Digite o nome do satélite que deseja remover.')
+function showTopFive(){
+  const topFive = users.slice().sort((a, b) => b.public_repos - a.public_repos).slice(0, 5)
 
-  for(let i = 0; i < planets.length; i++){
-    if(planets[i].name === name){
-      const index = planets[i].satelites.indexOf(sateliteParaRemover);
-      if (index !== -1) {
-        planets[i].satelites.splice(index, 1);
-        alert(`O satélite ${sateliteParaRemover} foi removido do planeta ${name}.`);
-        return
-      }else{
-        alert(`O satélite com o nome ${sateliteParaRemover} não foi encontrado.`);
-        return
-      }
-    }
-  }
-alert(`Planeta com o nome ${name} não encontrado.`);
+  let message = 'Top 5 usuários com mais repositórios públicos:\n'
+
+  topFive.forEach((user, index) => {
+    message += `\n${index + 1} - ${user.login}: ${user.public_repos} repositórios`
+  })
+
+  alert(message)
 }
 
+async function main() {
+  await fetchUser('isaacpontes')
+  await fetchUser('julianaconde')
+  await fetchUser('pcaldass')
+  await fetchUser('lucasqueirogaa')
+  await fetchUser('frans203')
+  await fetchUser('LeDragoX')
 
-function listPlanets() {
-  let planetsInfo = "";
-  planets.forEach(planet => {
-    planetsInfo += `Planeta ${planet.name}. \n
-                 ${planet.coordenadas}.\n
-                 Situacao do ${planet.name}: ${planet.situacao}.\n
-                 Lista de Satélites: ${planet.satelites}.\n\n`;
-  });
-  alert(planetsInfo);
-}
-  
+  await showUser('isaacpontes')
+  await showUser('julianaconde')
 
-  function chamarTodasAsFunctions(){
-    let continuar = true;
-    do {
-    let contador = Number(prompt(`Cadastrar Planeta - 1
-Atualizar situacao de um determinado planeta - 2
-Adicionar um Satélite a um determinado planeta - 3
-Remover um Satélite de um determinado planeta - 4
-Listar todos os planetas salvos - 5
-Encerrar - 6`));
-    switch(contador){
-      case 1:
-        valuesPlanet();
-        break;
-      case 2:
-        updatePlanetSituation();
-        break;
-      case 3:
-        addSatelite();
-        break;
-      case 4:
-        removeSatelite();
-        break;
-      case 5:
-        listPlanets();
-        break;
-      case 6:
-        continuar = false;
-        break;
-      default:
-     alert("Opçao inválida!")
-  }
-}while (continuar);
+  showAllUsers()
+  showReposTotal()
+  showTopFive()
 }
 
-chamarTodasAsFunctions()
+main()

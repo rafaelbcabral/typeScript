@@ -2,9 +2,9 @@
   "name": "03",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-	"scripts": {
-    "tsc-watch": "tsc --watch"
+  "main": "public/dist/index.js",
+  "scripts": {
+    "build": "tsc --watch"
   },
   "keywords": [],
   "author": "",

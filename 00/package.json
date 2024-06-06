@@ -1,12 +1,11 @@
 {
-  "name": "04",
+  "name": "cls",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tsc-watch": "tsc"
+    "tsc-watch": "tsc --watch"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {

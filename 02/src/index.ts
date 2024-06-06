@@ -1,177 +1,157 @@
-let spaceShips = []
+let planets = []
 
-function saveSpaceShip(name: string, pilot: string, crewLimit: number){
-
-  let spaceShip = {
+function addPlanet(name: string, coordenadas: [number, number, number, number], situacao: "habitado" | "habitavel" | "inabitavel" | "inexplorado", satelites: string[]){
+  let planet = {
     name,
-    pilot,
-    crewLimit,
-    crew: [],
-    inMission: false
+    coordenadas,
+    situacao,
+    satelites
   }
 
-  spaceShips.push(spaceShip)
-  alert(`A nave ${spaceShip.name} foi registrada.`)
+  planets.push(planet);
+  alert(`${planet.name} foi adicionado.`)
+
 }
 
-
-function addMemberInCrew(name: string, spaceShip:{name: string, crew: string[], crewLimit: number}){
-
-  if(spaceShip.crew.length < spaceShip.crewLimit ){
-    spaceShip.crew.push(name);
-    alert(`${name} foi adicionado à tripulação da ${spaceShip.name}`)
-  }else{
-    alert("O limite de tribulantes foi excedido.")
+function valuesPlanet(){
+  const name = prompt('Qual é o nome do planeta a ser registrado?')
+  const coordenada1 = parseFloat(prompt('Qual é a primeira coordenada?'))
+  const coordenada2 = parseFloat(prompt('Qual é a segunda coordenada?'))
+  const coordenada3 = parseFloat(prompt('Qual é a terceira coordenada?'))
+  const coordenada4 = parseFloat(prompt('Qual é a quarta coordenada?'))  
+  
+  if (isNaN(coordenada1) || isNaN(coordenada2) || isNaN(coordenada3) || isNaN(coordenada4)) {
+    alert('Uma ou mais coordenadas não são válidas. Por favor, insira números válidos.');
     return;
   }
-}
-
-function OnMission(missionName: string, spaceShip:{name: string, pilot: string, crewLimit: number, crew: string[], inMission: boolean}){
-
-  if (spaceShip.inMission) {
-    return `A espaçonave ${spaceShip.name} já está em missão.`;
-  }
-
-  let crewRequired = Math.floor(spaceShip.crewLimit / 3);
-  if(spaceShip.crew.length >= crewRequired ){
-    spaceShip.inMission = true;
-    return `A espaçonave ${spaceShip.name} com o piloto ${spaceShip.pilot} e ${spaceShip.crew.length} tripulantes iniciou a missão "${missionName}".`;
-}else{
-  alert(`${spaceShip.name} não pode ser enviada. Tripulação insuficiente.`)
-}
-}
-
-function RegisteredSpaceShips(spaceShip: {name: string, pilot: string, crewLimit: number, crew: string[], inMission: boolean}){
-
-  if(spaceShips.length > 0){
-  return spaceShips.forEach((spaceShip) => {
-    console.log(`spaceShip\n`);
-  });
-  }
-}
-
-function findSpaceship(name: string) {
-  let spaceship: {
-    name: string,
-    pilot: string,
-    crewLimit: number,
-    crew: string[],
-    inMission: boolean
-  }
   
-  spaceship = spaceShips.find((ship) => {
-    return ship.name === name
-  });
+  const coordenadas: [number, number, number, number]  = [coordenada1, coordenada2, coordenada3, coordenada4]
+  const situacao = prompt("Qual a situacao do planeta? (habitado, habitavel, inabitavel, inexplorado)")
   
-  return spaceship
-}
+  if (situacao === "habitado" || situacao === "habitavel" || situacao === "inabitavel" || situacao === "inexplorado") {
+    const satelites = []
 
-function firstMenuOption() {
-  const name = prompt('Qual é o nome da nave a ser registrada?')
-  const pilot = prompt(`Qual é o nome do piloto da ${name}`)
-  const crewLimit = Number.parseInt(prompt(`Quantos tripulantes a ${name} suporta?`))
+    do {
+      const nomeSatelite = prompt('Digite o nome de um satelite');
+      satelites.push(nomeSatelite);
+      var adicionarSatelite = String(prompt(`Deseja adicionar mais um satelite? Digite "Sim" se deseja ou pressione qualquer tecla para sair.`));
+  } while (adicionarSatelite == "Sim");
 
-  const confirmation = confirm(`Confirma o registro da nave ${name}?\nPiloto: ${pilot}\nTamanho da Tripulação: ${crewLimit}`)
-
-  if (confirmation) {
-    saveSpaceShip(name, pilot, crewLimit)
+    addPlanet(name, coordenadas, situacao, satelites);
+  } else{
+    alert('Situação inválida. Por favor, insira uma situação válida.');
   }
 }
 
-function secondMenuOption() {
-  const member = prompt('Qual é o nome do tripulante?')
-  const spaceshipName = prompt(`Para qual nave ${member} deverá ser designado?`)
+function updatePlanetSituation() {
+  const name = prompt('Qual é o nome do planeta cuja situação você deseja atualizar?');
+  const newSituacao = prompt('Qual a nova situação do planeta? (habitado, habitavel, inabitavel, inexplorado)');
 
-  const spaceship = findSpaceship(spaceshipName)
+  if (newSituacao !== "habitado" && newSituacao !== "habitavel" && newSituacao !== "inabitavel" && newSituacao !== "inexplorado") {
+    alert('Situação inválida. Por favor, insira uma situação válida.');
+    return;
+  }
 
-  if (spaceship) {
-    const confirmation = confirm(`Confirma a inclusão de ${member} na tripulação da ${spaceship.name}?`)
+  for (let i = 0; i < planets.length; i++) {
 
-    if (confirmation) {
-      addMemberInCrew(member, spaceship)
+    if(planets[i].situacao === newSituacao){
+      alert(`O planeta já está na situaçao ${newSituacao}!`)
+      return
+    }
+    if (planets[i].name == name) {
+      planets[i].situacao = newSituacao;
+      alert(`A situação do planeta ${name} foi atualizada para ${newSituacao}.`);
+      return;
     }
   }
+
+  alert(`Planeta com o nome ${name} não encontrado.`);
 }
 
-function thirdMenuOption() {
-  const spaceshipName = prompt('Qual é o nome da nave a ser enviada?')
-  const nameMission = prompt('Qual o nome da missao a ser executada?')
-  const spaceship = findSpaceship(spaceshipName);
+function addSatelite(){
+  const name = prompt('Qual é o nome do planeta cuja deseja adicionar um satélite?');
+  const sateliteNovo = prompt('Digite o nome do satelite que quer adicionar');
 
-  if (spaceship) {
-    const confirmation = confirm(`Confirma e envio da ${spaceship.name} na missão?`)
+  for (let i = 0; i < planets.length; i++) {
+    if (planets[i].name === name) {
+      if (planets[i].satelites.includes(sateliteNovo)) {
+        alert(`${sateliteNovo} já está cadastrado!`);
+        return;
+      } else {
+        planets[i].satelites.push(sateliteNovo);
+        alert(`${sateliteNovo} adicionado ao planeta ${name}`);
+        return;
+      }
+  }
+}
+  alert(`Planeta com o nome ${name} não encontrado.`);
+}
 
-    if (confirmation) {
-      OnMission(nameMission, spaceship)
+function removeSatelite(){
+  const name = prompt('Qual o nome do planeta que deseja remover algum satélite?')
+  const sateliteParaRemover = prompt('Digite o nome do satélite que deseja remover.')
+
+  for(let i = 0; i < planets.length; i++){
+    if(planets[i].name === name){
+      const index = planets[i].satelites.indexOf(sateliteParaRemover);
+      if (index !== -1) {
+        planets[i].satelites.splice(index, 1);
+        alert(`O satélite ${sateliteParaRemover} foi removido do planeta ${name}.`);
+        return
+      }else{
+        alert(`O satélite com o nome ${sateliteParaRemover} não foi encontrado.`);
+        return
+      }
     }
   }
+alert(`Planeta com o nome ${name} não encontrado.`);
 }
 
-function fourthMenuOption() {
-  let list = 'Naves Registradas:\n'
 
-  spaceShips.forEach((spaceship: {
-    name: string,
-    pilot: string,
-    crewLimit: number,
-    crew: string[],
-    inMission: boolean
-  }) => {
-    list += `
-      Nave: ${spaceship.name}
-      Piloto: ${spaceship.pilot}
-      Em missão? ${spaceship.inMission ? 'Sim' : 'Não'}
-      Tamanho Máximo da Triuplação: ${spaceship.crewLimit}
-      Tripulantes: ${spaceship.crew.length}
-    `
-
-    spaceship.crew.forEach(member => {
-      list += `    - ${member}\n`
-    })
-
-  })
-
-  alert(list)
+function listPlanets() {
+  let planetsInfo = "";
+  planets.forEach(planet => {
+    planetsInfo += `Planeta ${planet.name}. \n
+                 ${planet.coordenadas}.\n
+                 Situacao do ${planet.name}: ${planet.situacao}.\n
+                 Lista de Satélites: ${planet.satelites}.\n\n`;
+  });
+  alert(planetsInfo);
 }
+  
 
-/**
- * Menu
- */
-
-let userOption = 0;
-
-while (userOption !== 5) {
-  const menu = `Painel Principal
-    1 - Registrar uma nova nave
-    2 - Adicionar membro da tripulação
-    3 - Enviar nave em missão
-    4 - Listar naves registradas
-    5 - Encerrar
-  `
-
-  userOption = Number.parseInt(prompt(menu))
-
-  switch (userOption) {
-    case 1:
-      firstMenuOption()
-      break
-    case 2:
-      secondMenuOption()
-      break
-    case 3:
-      thirdMenuOption()
-      break
-    case 4:
-      fourthMenuOption()
-      break
-    case 5:
-      alert('Encerrando o sistema...')
-      break
-    default:
-      alert('Opção inválida! Retornando ao painel principal...')
-      break;
+  function chamarTodasAsFunctions(){
+    let continuar = true;
+    do {
+    let contador = Number(prompt(`Cadastrar Planeta - 1
+Atualizar situacao de um determinado planeta - 2
+Adicionar um Satélite a um determinado planeta - 3
+Remover um Satélite de um determinado planeta - 4
+Listar todos os planetas salvos - 5
+Encerrar - 6`));
+    switch(contador){
+      case 1:
+        valuesPlanet();
+        break;
+      case 2:
+        updatePlanetSituation();
+        break;
+      case 3:
+        addSatelite();
+        break;
+      case 4:
+        removeSatelite();
+        break;
+      case 5:
+        listPlanets();
+        break;
+      case 6:
+        continuar = false;
+        break;
+      default:
+     alert("Opçao inválida!")
   }
+}while (continuar);
 }
 
-
-
+chamarTodasAsFunctions()
